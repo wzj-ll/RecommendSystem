@@ -47,3 +47,17 @@ class MatrixFactorization(nn.Module):
         scores = (self.user_vecs * self.item_vecs).sum(dim=1)
         return torch.sigmoid(scores)
     
+def train(model, dataloader, epochs, lr=0.01):
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    for epoch in range(epochs):
+        model.train()
+        epoch_loss = 0.0
+        for user, item, label in dataloader:
+            pred = model(user, item)
+            loss = criterion(pred, label)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss
